@@ -16,6 +16,7 @@ services:
     user: "101:101" # uid/gid used by nginx image
     volumes:
       - ./www:/var/www/html
+      - ./logs:/usr/local/log
   nginx:
     image: nginx:1.20.1
     volumes:
