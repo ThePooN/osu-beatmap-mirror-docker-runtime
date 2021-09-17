@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  cronjob:
+    build: ./cronjob
+    user: "101:101" # uid/gid used by nginx image
+    volumes:
+      - ./www:/var/www/html
+    # environment:
+      # - MAX_DISK_USAGE_PERCENTAGE=
+      # - DELETE_LAST_ACCESS=
+      # - DELETE_PERCENTAGE_INCREMENT=
+      # - DISCORD_WEBHOOK_URL=
   php:
     image: php:7.4.23-fpm-bullseye
     user: "101:101" # uid/gid used by nginx image
