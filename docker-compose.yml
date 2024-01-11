@@ -7,10 +7,10 @@ services:
     volumes:
       - ./www:/var/www/html
     # environment:
-      # - MAX_DISK_USAGE_PERCENTAGE=
-      # - DELETE_LAST_ACCESS=
-      # - DELETE_PERCENTAGE_INCREMENT=
-      # - DISCORD_WEBHOOK_URL=
+      # MAX_DISK_USAGE_PERCENTAGE: ""
+      # DELETE_LAST_ACCESS: ""
+      # DELETE_PERCENTAGE_INCREMENT: ""
+      # DISCORD_WEBHOOK_URL: ""
   php:
     build: ./php
     user: "101:101" # uid/gid used by nginx image
