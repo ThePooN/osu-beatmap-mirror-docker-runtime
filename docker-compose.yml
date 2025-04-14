@@ -20,8 +20,8 @@ services:
     image: nginx:1.26.3
     volumes:
       - ./www:/var/www/html
-      - ./logs:/var/log/nginx:rw
-      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./logs:/var/log/nginx
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/includes:/etc/nginx/includes
     ports:
       - 80:8000
