@@ -1,10 +1,9 @@
-FROM php:7.4.23-fpm-bullseye
+FROM php:8.4.6-fpm-alpine3.21
 
-RUN DEBIAN_FRONTEND=noninteractive \
-  apt-get update && \
-  apt-get -y upgrade && \
-  apt-get -y install --no-install-recommends zip && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache zip
+
+RUN mkdir -p /usr/local/log && touch /usr/local/log/www.log.slow && chown 101:101 /usr/local/log/www.log.slow
+
+RUN ln -sf /proc/1/fd/1 /usr/local/log/www.log.slow
 
 COPY zz-www.conf /usr/local/etc/php-fpm.d/zz-www.conf
