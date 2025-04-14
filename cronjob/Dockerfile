@@ -1,11 +1,6 @@
-FROM debian:11-slim
+FROM alpine:3.21.3
 
-RUN DEBIAN_FRONTEND=noninteractive \
-  apt-get update && \
-  apt-get -y upgrade && \
-  apt-get -y install --no-install-recommends bash bc ca-certificates curl && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache bash bc curl ca-certificates
 
 # Install supercronic
 ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.1.12/supercronic-linux-amd64 \
