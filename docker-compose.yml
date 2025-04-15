@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   cronjob:
     build: ./cronjob
@@ -17,15 +15,14 @@ services:
     user: "101:101" # uid/gid used by nginx image
     volumes:
       - ./www:/var/www/html
-      - ./logs:/usr/local/log
     restart: unless-stopped
   nginx:
-    image: nginx:1.20.1
+    image: nginx:1.26.3
     volumes:
       - ./www:/var/www/html
       - ./logs:/var/log/nginx
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/includes:/etc/nginx/includes
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/includes:/etc/nginx/includes:ro
     ports:
       - 80:8000
       - 443:4430
