@@ -21,13 +21,18 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y docker-compose
-        docker-compose --version
+
+    - name: Display docker-compose version
+      run: docker-compose --version
 
     - name: Build container images
       run: docker-compose build
 
     - name: Start containers
       run: docker-compose up -d
+
+    - name: Allow some time for containers to start
+      run: sleep 10
 
     - name: Show container status
       run: docker-compose ps
