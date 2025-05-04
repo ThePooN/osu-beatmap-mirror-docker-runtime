@@ -32,7 +32,7 @@ jobs:
       run: docker-compose up -d
 
     - name: Allow some time for containers to start
-      run: sleep 10
+      run: sleep 5
 
     - name: Show container status
       run: docker-compose ps
@@ -45,8 +45,21 @@ jobs:
 
     - name: Check HTTP on port 80
       run: |
-        RESPONSE=$(curl -fs http://localhost:80)
-        echo "$RESPONSE" | grep -q "osu! download mirror" || (echo "Expected content not found on HTTP"; docker-compose logs && exit 1)
+        # Give it a bit more time to ensure the service is ready
+        echo "Waiting for port 80 to be ready..."
+        for i in {1..5}; do
+          RESPONSE=$(curl -fs http://localhost:80) && break || echo "Attempt $i failed (retrying in 3 seconds), response: $RESPONSE"
+          sleep 3
+        done
+
+        # Check the response for 'osu! download mirror' string.
+        if echo "$RESPONSE" | grep -q "osu! download mirror"; then
+          echo "Successfully found expected content on HTTP."
+        else
+          echo "Expected content not found on HTTP, response was: $RESPONSE"
+          docker-compose logs
+          exit 1
+        fi
 
     - name: Stop containers / tear down
       run: docker-compose down
