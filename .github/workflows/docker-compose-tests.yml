@@ -17,34 +17,31 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Install docker-compose
+    - name: Install docker-compose via apt
       run: |
         sudo apt update
         sudo apt install -y docker-compose
         docker-compose --version
 
-    - name: Build Docker Compose services
+    - name: Build container images
       run: docker-compose build
 
-    - name: Run Docker Compose services
+    - name: Start containers
       run: docker-compose up -d
-
-    - name: Wait for containers to start
-      run: sleep 10
 
     - name: Show container status
       run: docker-compose ps
 
     - name: Display nginx version
-      run: docker-compose exec nginx printenv NGINX_VERSION
+      run: docker inspect osu-beatmap-mirror-docker-runtime_nginx_1 | jq -r '.[0].Config.Env[] | select(test("^NGINX_VERSION=")) | split("=")[1]'
 
     - name: Display PHP version
-      run: docker-compose exec php printenv PHP_VERSION
+      run: docker inspect osu-beatmap-mirror-docker-runtime_php_1 | jq -r '.[0].Config.Env[] | select(test("^PHP_VERSION=")) | split("=")[1]'
 
     - name: Check HTTP on port 80
       run: |
         RESPONSE=$(curl -fs http://localhost:80)
         echo "$RESPONSE" | grep -q "osu! download mirror" || (echo "Expected content not found on HTTP"; docker-compose logs && exit 1)
 
-    - name: Tear down
+    - name: Stop containers / tear down
       run: docker-compose down
