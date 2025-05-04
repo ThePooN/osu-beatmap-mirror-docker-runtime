@@ -45,21 +45,24 @@ jobs:
 
     - name: Test that nginx and PHP are working
       run: |
-        # Give it a bit more time to ensure the service is ready
+        # Give it a bit more time to ensure the service is ready.
         for i in {1..5}; do
           RESPONSE=$(curl -fs http://localhost:80/everything-is-working.php) && break || echo "Attempt $i failed (retrying in 3 seconds).."
           sleep 3
         done
 
         # Check the response for 'everything-is-working' string.
-        if echo "$RESPONSE" | grep -q 'osu! download mirror'; then
+        if echo "$RESPONSE" | grep -q 'everything-is-working'; then
           echo "Successfully found expected content on HTTP."
         else
           echo "Expected content not found on HTTP.."
+          echo "---"
           curl -v http://localhost:80/everything-is-working.php
+          echo -e "\n---"
           docker-compose logs
           exit 1
         fi
 
     - name: Stop containers / tear down
+      if: always()
       run: docker-compose down
