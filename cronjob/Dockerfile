@@ -1,4 +1,4 @@
-FROM alpine:3.21.3
+FROM alpine:latest
 
 RUN apk add --no-cache bash bc curl ca-certificates supercronic
 
