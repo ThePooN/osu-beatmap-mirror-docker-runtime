@@ -43,20 +43,20 @@ jobs:
     - name: Display PHP version
       run: docker inspect osu-beatmap-mirror-docker-runtime_php_1 | jq -r '.[0].Config.Env[] | select(test("^PHP_VERSION=")) | split("=")[1]'
 
-    - name: Check HTTP on port 80
+    - name: Test that nginx and PHP are working
       run: |
         # Give it a bit more time to ensure the service is ready
-        echo "Waiting for port 80 to be ready..."
         for i in {1..5}; do
-          RESPONSE=$(curl -fs http://localhost:80) && break || echo "Attempt $i failed (retrying in 3 seconds), response: $RESPONSE"
+          RESPONSE=$(curl -fs http://localhost:80/everything-is-working.php) && break || echo "Attempt $i failed (retrying in 3 seconds).."
           sleep 3
         done
 
-        # Check the response for 'osu! download mirror' string.
-        if echo "$RESPONSE" | grep -q "osu! download mirror"; then
+        # Check the response for 'everything-is-working' string.
+        if echo "$RESPONSE" | grep -q 'osu! download mirror'; then
           echo "Successfully found expected content on HTTP."
         else
-          echo "Expected content not found on HTTP, response was: $RESPONSE"
+          echo "Expected content not found on HTTP.."
+          curl -v http://localhost:80/everything-is-working.php
           docker-compose logs
           exit 1
         fi
