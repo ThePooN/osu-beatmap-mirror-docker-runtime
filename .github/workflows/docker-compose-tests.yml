@@ -1,0 +1,64 @@
+name: Docker Compose Build and Run Test
+
+on: [push, pull_request]
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Install docker-compose via apt
+      run: |
+        sudo apt update
+        sudo apt install -y docker-compose
+
+    - name: Display docker-compose version
+      run: docker-compose --version
+
+    - name: Build container images
+      run: docker-compose build
+
+    - name: Start containers
+      run: docker-compose up -d
+
+    - name: Allow some time for containers to start
+      run: sleep 5
+
+    - name: Show container status
+      run: docker-compose ps
+
+    - name: Display nginx version
+      run: docker inspect osu-beatmap-mirror-docker-runtime_nginx_1 | jq -r '.[0].Config.Env[] | select(test("^NGINX_VERSION=")) | split("=")[1]'
+
+    - name: Display PHP version
+      run: docker inspect osu-beatmap-mirror-docker-runtime_php_1 | jq -r '.[0].Config.Env[] | select(test("^PHP_VERSION=")) | split("=")[1]'
+
+    - name: Test that nginx and PHP are working
+      run: |
+        # Give it a bit more time to ensure the service is ready.
+        for i in {1..5}; do
+          RESPONSE=$(curl -fs http://localhost:80/everything-is-working.php) && break || echo "Attempt $i failed (retrying in 3 seconds).."
+          sleep 3
+        done
+
+        # Check the response for 'everything-is-working' string.
+        if echo "$RESPONSE" | grep -q 'everything-is-working'; then
+          echo "Successfully found expected content on HTTP."
+        else
+          echo "Expected content not found on HTTP.."
+          echo "---"
+          curl -v http://localhost:80/everything-is-working.php
+          echo -e "\n---"
+          docker-compose logs
+          exit 1
+        fi
+
+    - name: Stop containers / tear down
+      if: always()
+      run: docker-compose down

@@ -17,10 +17,12 @@ services:
       - ./www:/var/www/html
     restart: unless-stopped
   nginx:
-    image: nginx:1.26.3
+    build: ./nginx
     volumes:
       - ./www:/var/www/html
-      - ./logs:/var/log/nginx
+      - ./logs/nginx:/var/log/nginx
+      - ./logs/supervisord:/var/log/supervisord
+      - ./nginx/supervisord.conf:/etc/supervisord.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/includes:/etc/nginx/includes:ro
     ports:
