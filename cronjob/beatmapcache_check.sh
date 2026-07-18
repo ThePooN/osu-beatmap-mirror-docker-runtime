@@ -24,7 +24,7 @@ function log_message () {
 
 function updateUsedPercentage() {
     # Check total storage used, and remove if greater than or equal to $max_disk_usage_percentage percent.
-    used_storage_percentage=$(df -h $beatmapCache_folder | tail -n1 | awk '{print$5}' | sed -e 's/\%//g')
+    used_storage_percentage=$(df -h $beatmapCache_folder --output=pcent | tail -n1 | sed -e 's/\%//g')
 }
 
 # Check if the beatmapCache folder exists!
@@ -42,7 +42,7 @@ while [ "${used_storage_percentage}" -ge "${max_disk_usage_percentage}" ]; do
 
     # Reduce last access used in next loop
     delete_last_access=$(printf %.0f $(echo "$delete_last_access * (1 - $delete_percentage_increment/100)" | bc -l))
-    updateUsedPercentage    
+    updateUsedPercentage
 done
 
 log_message "Complete. There's currently $(df -h $beatmapCache_folder | tail -n1 | awk '{print$5}') free on $beatmapCache_folder"
